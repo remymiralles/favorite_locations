@@ -119,7 +119,7 @@ BAM.addView = Backbone.View.extend({
 				$('#lat').val() ==="" ||
 				$('#long').val() ===""
 			){
-			alert("Address invalid");
+			alert("Your address is invalid");
 			return false;
 		}
 
