@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+	<html>
+	<head>
+		<meta charset="utf-8">
+		<title>hello-backbonejs</title>
+
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+      html { height: 100% }
+      body { height: 100%; margin: 0; padding: 0 }
+      #map-canvas { height: 10% }
+    </style>		
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAjV9fRvgpFI2g5FcwnIkU4lVu9QfL-ddM&sensor=true"></script>
+		<script type="text/javascript" src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+		<script type="text/javascript" src="http://ajax.cdnjs.com/ajax/libs/underscore.js/1.1.6/underscore-min.js"></script>
+		<script type="text/javascript" src="http://ajax.cdnjs.com/ajax/libs/backbone.js/0.3.3/backbone-min.js"></script>    		
+
+    <script type="text/javascript">
+    //   function initialize() {
+    //     var mapOptions = {
+    //       center: new google.maps.LatLng(-34.397, 150.644),
+    //       zoom: 8,
+    //       mapTypeId: google.maps.MapTypeId.ROADMAP
+    //     };
+    //     var map = new google.maps.Map(document.getElementById("map-canvas"),
+    //         mapOptions);
+    //   	new google.maps.LatLng(-34.397, 130.644)
+
+			 //  var locations = [
+			 //      ['Bondi Beach', -33.890542, 151.274856, 4],
+			 //      ['Coogee Beach', -33.923036, 151.259052, 5],
+			 //      ['Cronulla Beach', -34.028249, 151.157507, 3],
+			 //      ['Manly Beach', -33.80010128657071, 151.28747820854187, 2],
+			 //      ['Maroubra Beach', -33.950198, 151.259302, 1]
+			 //    ];
+
+			 //    var infowindow = new google.maps.InfoWindow();
+
+			 //    var marker, i;
+
+			 //    for (i = 0; i < locations.length; i++) {  
+			 //      marker = new google.maps.Marker({
+			 //        position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+			 //        map: map
+			 //      });
+			 //    }
+
+    //   }
+
+
+
+    //   // google.maps.event.addListener(marker, 'click', (function(marker, i) {
+    //   //   return function() {
+    //   //     infowindow.setContent(locations[i][0]);
+    //   //     infowindow.open(map, marker);
+    //   //   }
+    //   // })(marker, i));
+
+    //   google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+		<style type="text/css">
+		#location1 {
+		    height: 400px;
+		}</style>
+	</head>
+	<body>
+
+		<header>
+			Addressbook in Backbone.js  
+		</header>
+		<div class='table abWrapper'>
+			<div class='row'>
+				<div class='cell abLinks'>
+					<a href='#add_new_location'>Add New Location</a><br />
+					<a href='#list_locations'>List all Locations</a><br />
+					<a href='#search_locations'>Search any Location</a><br />
+				</div>
+				<div class='cell abPanel'>Loading... Please Wait.</div>
+			</div>
+		</div>
+
+		<!-- mapviewLocation View starts here -->
+		<script type='text/template'  id="mapViewTemplate">
+			<div id="map"> </div>
+		</script>
+		<!-- mapviewLocation View ends here -->
+
+
+		<!-- addNewLocation View starts here -->
+		<script type='text/template' id='addLocationTemplate'>
+			<h2><%= $.isEmptyObject(location) ? 'Add' : 'Edit'%> New Location</h2>
+			<form id='frmAddLocation'>
+				<div>Name:</div> <input type='text' id='name' class='input' value="<%= !$.isEmptyObject(location) ? location.name : '' %>" /> <span class='false full_name_error'></span><br />
+				<div>address:</div> <input type='text' id='address' class='input' value="<%= !$.isEmptyObject(location) ? location.address : '' %>" />  <span class='false email_error'></span><br />
+				<div>lat:</div> <input type='text' id='lat' class='input' value="<%= !$.isEmptyObject(location) ? location.lat : '' %>" />  <span class='false phone_error'></span><br />
+				<div>long:</div> <input type='text' id='long' class='input' value="<%= !$.isEmptyObject(location) ? location.long : '' %>" />  <span class='false phone_error'></span><br /><br />   
+				<input type='submit' value='<%= $.isEmptyObject(location) ? 'Save' : 'Update'%> Location Details' class='button' />
+				<span class='success'></span>
+				<input type='hidden' id='id' class='input' value="<%= !$.isEmptyObject(location) ? location.id : '' %>"/>
+			</form>
+		</script>
+		<!-- addNewLocation View ends here -->
+
+		<!-- listLocations View starts here -->
+		<script type='text/template' id='listLocationsTemplate'>
+				<h2>List Locations</h2>
+				<table id='locationsGrid' width='100%' border='1' cellspacing='1' cellpadding='5'>
+						<tr>
+								<td width='25%'><b>Name</b></td>
+								<td width='25%'><b>address</b></td>
+								<td width='15%'><b>lat</b></td>
+								<td width='25%'><b>long</b></td>
+								<td width='10%' align='center'><b>Action</b></td>
+						</tr>
+						<%  if ($.isEmptyObject(locations)) { %>
+								<tr><td colspan='5'>No Record Found</td></tr>
+						<%  } else { 
+								$.each(locations, function () { %>
+								<tr data-id=<%= this.id%>>
+										<td><%= this.name%></td>
+										<td><%= this.address %></td>
+										<td><%= this.lat %></td>
+										<td><%= this.long %></td>
+										<td align='center'><a>Edit</a> | <a>Delete</a></td>
+								</tr>
+								<%    
+								})
+						}%>
+				</table>
+		</script>
+		<!-- listLocations View ends here -->
+
+		<!-- searchLocations View starts here -->
+		<script type='text/template' id='searchLocationsTemplate'>
+				<h2>Search Locations</h2>
+				<form id='frmSearchLocations'>
+						<div>name:</div> <input type='text' id='full_name' class='input' /> <br />
+						<div>address:</div> <input type='text' id='email' class='input' /> <br />
+						<input type='submit' value='Search Location' class='button' />
+				</form>
+				<div id='grid'></div>
+		</script>
+		<!-- searchLocations View ends here -->
+
+<div id="location1">
+    <div id="map" style="width:100%; height:100%">
+    </div>
+</div>
+
+<!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.2.min.js"><\/script>')</script>
+ -->
+<script src="/static/js/plugins.js"></script>
+<script src="/static/js/script.js"></script>  
+<script type="text/javascript" src="/static/js/autocomplete.js"></script>  
+<script src="/static/js/handlebars.js"></script>  
+
+
+
+</body>
+	</html>
+						

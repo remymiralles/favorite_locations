@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+{% block body %}
+	{% if error %}
+		<p class=error><strong>Error:</strong> {{ error }}
+	{% endif %}
+	{% with messages = get_flashed_messages() %}
+		{% if messages %}
+			<div class=flashes>
+			{% for message in messages %}
+				{{ message }}
+			{% endfor %}
+			</div>
+		{% endif %}
+	{% endwith %}
+	<div id="form_container">
+		<h1>Sign In</h1>
+		<div id="standard_form">
+			<form action="{{ url_for('login') }}" method="post">
+						{{ form.hidden_tag() }}
+	
+				<p class="error_message" style="display:none;">
+	
+				</p><div class="form_label">
+					{{ form.username.label }}
+				</div>
+				<div class="form_input">
+					{{ form.username }}
+				</div>
+	
+				<div class="form_clear"></div>
+	
+				<div class="form_label">
+					{{ form.password.label }}
+				</div>
+				<div class="form_input">
+					{{ form.password }}
+				</div>
+	
+				<div class="form_clear"></div>
+	
+	      <div class="formSubmitButton"><span>{{ form.submit }}</span></div>
+	
+			</form>
+			<div>
+				Testing account: <br />
+				username = <b>remy</b> <br />
+				password = <b>test</b>
+			</div>
+		</div>
+	</div>		
+{% endblock %}
