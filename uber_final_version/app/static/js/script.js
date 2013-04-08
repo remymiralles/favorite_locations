@@ -4,7 +4,6 @@ var BAM = {
 	run: function () {
 		this.addview = new this.addView();
 		this.listview = new this.listView();
-		this.searchview = new this.searchView();
 		this.locationscollection = new BAM.locationsCollection();
 
 		this.router = new this.Router();
@@ -17,7 +16,6 @@ BAM.Router = Backbone.Router.extend({
 	routes: {
 		'list_locations': 	'renderListLocationsPage', 
 		'add_new_location': 	'renderAddNewLocationPage', 
-		'search_locations': 	'renderSearchLocationsPage', 
 		'edit_location/:id': 'renderEditLocationPage'		
 	}, 
 
@@ -33,10 +31,6 @@ BAM.Router = Backbone.Router.extend({
 
 		BAM.listview.setElement('div.abPanel');
 		BAM.listview.listLocationsPage(filters);
-	}, 
-
-	renderSearchLocationsPage: function () {
-		BAM.searchview.searchLocationsPage();
 	}, 
 
 	renderEditLocationPage: function (id) {
@@ -230,7 +224,7 @@ BAM.addView = Backbone.View.extend({
 									response(emptyResponseData);
 								} else {
 									response(responseData);
-									console.log(responseData);
+									// console.log(responseData);
 								}
 							}
 						}
@@ -252,7 +246,7 @@ BAM.addView = Backbone.View.extend({
 BAM.Map = Backbone.Model.extend({
   defaults: {
 	center: new google.maps.LatLng(-34.397, 150.644),
-	zoom: 8,
+	zoom: 13,
 	mapTypeId: google.maps.MapTypeId.ROADMAP
   }
 });
@@ -264,7 +258,7 @@ BAM.MapView = Backbone.View.extend({
 	initialize: function() {
 
 		var mapOptions = {
-				  zoom: 8,
+				  zoom: 13,
 				  center: new google.maps.LatLng(-34.397, 150.644),
 				  mapTypeId: google.maps.MapTypeId.ROADMAP
 				};
@@ -375,33 +369,6 @@ BAM.listView = Backbone.View.extend({
 
 });
 
-/* searchLocations View */
-BAM.searchView = Backbone.View.extend({
-	el: 'div.abPanel', 
-
-	template: _.template($('#searchLocationsTemplate').html()), 
-
-	events: {
-		'submit form#frmSearchLocations': 'searchLocations'
-	},
-
-	initialize: function () {
-		_.bindAll(this, 'searchLocationsPage', 'searchLocations');
-	}, 
-
-	searchLocationsPage: function () {
-		this.$el.html(this.template);
-		BAM.listview.setElement('#grid');
-		BAM.listview.render({});
-	}, 
-
-	searchLocations: function (event) {
-		var ownerid = $('#ownerid').val();
-		BAM.listview.setElement('#grid');
-		BAM.listview.listLocationsPage({ownerid: ownerid});
-		return false;
-	}
-});
 
 
 $(document).ready(function() { 
